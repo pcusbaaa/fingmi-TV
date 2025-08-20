@@ -1,5 +1,105 @@
 <resources>
 
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/background</item>
+    </style>
+
+    <!-- Android TV Leanback Theme -->
+    <style name="Theme.Leanback" parent="Theme.Leanback">
+        <item name="leanbackTheme">@style/Theme.Leanback</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="android:buttonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <!-- Leanback GuidedStep Theme -->
+    <style name="Theme.Leanback.GuidedStep" parent="Theme.Leanback.GuidedStep">
+        <item name="guidedStepBackground">@color/guided_step_background</item>
+        <item name="guidedStepActionButtonStyle">@style/GuidedStepActionButton</item>
+    </style>
+
+    <!-- Browse Fragment Theme -->
+    <style name="Theme.Leanback.Browse" parent="Theme.Leanback">
+        <item name="browseRowsMarginStart">@dimen/browse_rows_margin_start</item>
+        <item name="browseRowsMarginEnd">@dimen/browse_rows_margin_end</item>
+        <item name="browseTitleTextStyle">@style/BrowseTitle</item>
+    </style>
+
+    <!-- Details Fragment Theme -->
+    <style name="Theme.Leanback.Details" parent="Theme.Leanback">
+        <item name="detailsDescriptionBodyStyle">@style/DetailsDescriptionBody</item>
+        <item name="detailsDescriptionTitleStyle">@style/DetailsDescriptionTitle</item>
+    </style>
+
+    <!-- Playback Controls Theme -->
+    <style name="Theme.Leanback.Playback" parent="Theme.Leanback">
+        <item name="playbackControlsButtonStyle">@style/PlaybackControlsButton</item>
+        <item name="playbackControlsActionIcons">@style/PlaybackControlsActionIcons</item>
+    </style>
+
+    <!-- GuidedStep Action Button -->
+    <style name="GuidedStepActionButton" parent="Widget.Leanback.GuidedStepActionButton">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/button_guided_step</item>
+    </style>
+
+    <!-- Browse Title Style -->
+    <style name="BrowseTitle" parent="Widget.Leanback.BrowseTitle">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Details Description Title -->
+    <style name="DetailsDescriptionTitle" parent="Widget.Leanback.DetailsDescriptionTitle">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Details Description Body -->
+    <style name="DetailsDescriptionBody" parent="Widget.Leanback.DetailsDescriptionBody">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/gray_light</item>
+    </style>
+
+    <!-- Playback Controls Button -->
+    <style name="PlaybackControlsButton" parent="Widget.Leanback.PlaybackControlsButton">
+        <item name="android:minWidth">64dp</item>
+        <item name="android:minHeight">64dp</item>
+    </style>
+
+    <!-- Playback Controls Action Icons -->
+    <style name="PlaybackControlsActionIcons">
+        <item name="playbackControlPauseDrawable">@drawable/ic_pause</item>
+        <item name="playbackControlPlayDrawable">@drawable/ic_play</item>
+        <item name="playbackControlRewindDrawable">@drawable/ic_rewind</item>
+        <item name="playbackControlFastForwardDrawable">@drawable/ic_fast_forward</item>
+    </style>
+
+    <!-- TV Card View Style -->
+    <style name="CardView.TV" parent="CardView">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+
+    <!-- TV Button Style -->
+    <style name="Button.TV" parent="Widget.AppCompat.Button">
+        <item name="android:minWidth">120dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/button_tv</item>
+    </style>
+
+    <!-- 原有的样式保持不变 -->
     <style name="Vod">
         <item name="cornerFamily">rounded</item>
     </style>
