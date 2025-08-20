@@ -143,4 +143,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
     annotationProcessor 'org.greenrobot:eventbus-annotation-processor:3.3.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.1.5'
+    implementation 'androidx.leanback:leanback:1.2.0-alpha02'
+    implementation 'androidx.leanback:leanback-preference:1.2.0-alpha02'
 }
