@@ -25,5 +25,12 @@
     <color name="white_70">#B3FFFFFF</color>
     <color name="white_80">#CCFFFFFF</color>
     <color name="white_90">#E6FFFFFF</color>
+    <color name="gray_light">#CCCCCC</color>
+    <color name="guided_step_background">#1A1A1A</color>
+    <color name="card_background">#2D2D2D</color>
+    <color name="primary">#2196F3</color>
+    <color name="primary_dark">#1976D2</color>
+    <color name="accent">#FF4081</color>
+    <color name="background">#121212</color>
 
 </resources>
