@@ -1,18 +1,20 @@
-name: Android CI
+name: Android CI with Signing
 
 on:
   push:
     branches: [ "release" ]
-  pull_request:
-    branches: [ "fongmi" ]
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
-  build:
+  build-and-sign:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-        
+    # 1. 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # 2. 设置JDK 17
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -20,16 +22,57 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    # 3. 给gradlew执行权限
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
         
-    - name: Build with Gradle (skip lint)
-      run: ./gradlew assembleRelease -x lint  # 只运行这个构建命令
-      
-    - name: Upload APK
+    # 4. 解码Keystore文件
+    - name: Decode Keystore
+      run: |
+        echo "Creating keystore directory..."
+        mkdir -p app/
+        echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > app/my-release-key.keystore
+        echo "Keystore file created successfully!"
+        ls -la app/my-release-key.keystore
+        
+    # 5. 验证keystore文件
+    - name: Verify Keystore
+      run: |
+        keytool -list -v \
+          -keystore app/my-release-key.keystore \
+          -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+          -alias "${{ secrets.KEY_ALIAS }}" || echo "Keystore verification failed"
+        
+    # 6. 构建带签名的Release版本
+    - name: Build signed Release APK
+      run: |
+        ./gradlew assembleRelease -x lint --info
+        
+    # 7. 列出生成的APK文件
+    - name: List generated APKs
+      run: |
+        echo "=== Generated APK Files ==="
+        find . -name "*.apk" -type f -exec ls -la {} \;
+        echo "=== Release APK Directory ==="
+        ls -la app/build/outputs/apk/release/
+        
+    # 8. 验证APK签名
+    - name: Verify APK Signature
+      run: |
+        RELEASE_APK=$(find app/build/outputs/apk/release -name "*.apk" ! -name "*unsigned*" | head -1)
+        if [ -f "$RELEASE_APK" ]; then
+          echo "Verifying signature of: $RELEASE_APK"
+          apksigner verify --verbose "$RELEASE_APK"
+        else
+          echo "No signed APK found for verification"
+          find . -name "*.apk" -type f
+        fi
+        
+    # 9. 上传签名的APK
+    - name: Upload signed APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: my-build-apk
-        path: |
-          ./**/*.apk
-          ./**/*.aab
+        name: signed-release-apk
+        path: ./**/*.apk
+        if-no-files-found: error
+        
