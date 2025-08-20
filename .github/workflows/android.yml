@@ -19,8 +19,21 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-
+        
+    - name: Build with Gradle (skip lint)
+      run: |
+        chmod +x gradlew
+        ./gradlew assembleRelease -x lint
+        
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-build-apk
+        path: |
+          ./**/*.apk
+          ./**/*.aab
