@@ -59,16 +59,22 @@ public class ConfigDialog {
     }
 
     private void initDialog() {
-        dialog = new MaterialAlertDialogBuilder(binding.getRoot().getContext()).setTitle(type == 0 ? R.string.setting_vod : type == 1 ? R.string.setting_live : R.string.setting_wall).setView(binding.getRoot()).setPositiveButton(edit ? R.string.dialog_edit : R.string.dialog_positive, this::onPositive).setNegativeButton(R.string.dialog_negative, this::onNegative).create();
+        dialog = new MaterialAlertDialogBuilder(binding.getRoot().getContext())
+                .setTitle(type == 0 ? R.string.setting_vod : type == 1 ? R.string.setting_live : R.string.setting_wall)
+                .setView(binding.getRoot())
+                .setPositiveButton(edit ? R.string.dialog_edit : R.string.dialog_positive, this::onPositive)
+                .setNegativeButton(R.string.dialog_negative, this::onNegative)
+                .create();
         dialog.getWindow().setDimAmount(0);
         dialog.show();
     }
 
     private void initView() {
-        binding.name.setText(getConfig().getName());
-        binding.url.setText(ori = getConfig().getUrl());
+        Config config = getConfig();
+        binding.name.setText(config.getName());
+        binding.url.setText(maskUrlDomain(ori = config.getUrl()));
         binding.input.setVisibility(edit ? View.VISIBLE : View.GONE);
-        binding.url.setSelection(TextUtils.isEmpty(ori) ? 0 : ori.length());
+        binding.url.setSelection(TextUtils.isEmpty(ori) ? 0 : maskUrlDomain(ori).length());
     }
 
     private void initEvent() {
@@ -131,5 +137,21 @@ public class ConfigDialog {
 
     private void onNegative(DialogInterface dialog, int which) {
         dialog.dismiss();
+    }
+
+    /**
+     * 将url中"//"和最后一个"/"之间的内容替换为一个*，协议和路径尾部保留
+     * 例如：http://aaa/bbb.json -> http://*/bbb.json
+     *      clan://domain/abc -> clan://*/abc
+     */
+    private String maskUrlDomain(String url) {
+        if (url == null) return "";
+        int idx = url.indexOf("//");
+        if (idx == -1) return url; // 没有协议部分
+        int lastSlash = url.lastIndexOf("/");
+        if (lastSlash <= idx + 1) return url; // 协议后没有路径
+        String protocol = url.substring(0, idx + 2); // http://
+        String suffix = url.substring(lastSlash);    // /bbb或/bbb.json
+        return protocol + "*" + suffix;
     }
 }

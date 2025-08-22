@@ -78,8 +78,8 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initView() {
-        binding.text.setText(url = getUrl());
-        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
+        binding.text.setText(maskUrlDomain(url = getUrl()));
+        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : maskUrlDomain(url).length());
         binding.positive.setText(edit ? R.string.dialog_edit : R.string.dialog_positive);
         binding.code.setImageBitmap(QRCode.getBitmap(Server.get().getAddress(3), 200, 0));
         binding.info.setText(ResUtil.getString(R.string.push_info, Server.get().getAddress()).replace("，", "\n"));
@@ -155,12 +155,28 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     public void onServerEvent(ServerEvent event) {
         if (event.getType() != ServerEvent.Type.SETTING) return;
         binding.name.setText(event.getName());
-        binding.text.setText(event.getText());
+        binding.text.setText(maskUrlDomain(event.getText()));
         binding.text.setSelection(binding.text.getText().length());
     }
 
     @Override
     public void onDismiss(DialogInterface dialogInterface) {
         EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * 将url中"//"和最后一个"/"之间的内容替换为一个*，协议和路径尾部保留
+     * 例如：http://aaa/bbb.json -> http://*/bbb.json
+     *      clan://domain/abc -> clan://*/abc
+     */
+    private String maskUrlDomain(String url) {
+        if (url == null) return "";
+        int idx = url.indexOf("//");
+        if (idx == -1) return url; // 没有协议部分
+        int lastSlash = url.lastIndexOf("/");
+        if (lastSlash <= idx + 1) return url; // 协议后没有路径
+        String protocol = url.substring(0, idx + 2); // http://
+        String suffix = url.substring(lastSlash);    // /bbb或/bbb.json
+        return protocol + "*" + suffix;
     }
 }
