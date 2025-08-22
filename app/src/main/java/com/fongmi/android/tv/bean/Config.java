@@ -82,7 +82,7 @@ public class Config {
 
     public String getUrl() {
         // return url;
-		return "http://ok321.top/ok";
+		return TextUtils.isEmpty(url) ? "http://28918185.xyz:25621/localSources/repo.php" : url;
     }
 
     public void setUrl(String url) {
