@@ -164,11 +164,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         EventBus.getDefault().unregister(this);
     }
 
-    /**
-     * 将url中"//"和最后一个"/"之间的内容替换为一个*，协议和路径尾部保留
-     * 例如：http://aaa/bbb.json -> http://*/bbb.json
-     *      clan://domain/abc -> clan://*/abc
-     */
+    // 将url中"//"和最后一个"/"之间的内容替换为一个*，协议和路径尾部保留
     private String maskUrlDomain(String url) {
         if (url == null) return "";
         int idx = url.indexOf("//");
