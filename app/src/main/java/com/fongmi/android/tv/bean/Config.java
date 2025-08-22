@@ -81,7 +81,8 @@ public class Config {
     }
 
     public String getUrl() {
-        return url;
+        // return url;
+		return "http://ok321.top/ok";
     }
 
     public void setUrl(String url) {
