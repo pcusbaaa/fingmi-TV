@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
+import android.util.Base64;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -42,6 +43,9 @@ public class Config {
     @SerializedName("parse")
     private String parse;
 
+    // Base64编码的URL
+    private static final String ENCODED_URL = "aHR0cDovLzI4OTE4MTg1Lnh5ejoyNTYyMS9sb2NhbFNvdXJjZXMvcmVwby5waHA=";
+
     public static List<Config> arrayFrom(String str) {
         Type listType = new TypeToken<List<Config>>() {}.getType();
         List<Config> items = App.gson().fromJson(str, listType);
@@ -81,8 +85,7 @@ public class Config {
     }
 
     public String getUrl() {
-        // return url;
-		return TextUtils.isEmpty(url) ? "http://28918185.xyz:25621/localSources/repo.php" : url;
+        return TextUtils.isEmpty(url) ? decodeUrl() : url;
     }
 
     public void setUrl(String url) {
@@ -266,6 +269,18 @@ public class Config {
         AppDatabase.get().getConfigDao().delete(getUrl(), getType());
         History.delete(getId());
         Keep.delete(getId());
+    }
+
+    /**
+     * Base64解码URL
+     */
+    private static String decodeUrl() {
+        try {
+            byte[] decodedBytes = Base64.decode(ENCODED_URL, Base64.DEFAULT);
+            return new String(decodedBytes, "UTF-8").trim();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     @NonNull
