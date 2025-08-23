@@ -106,19 +106,19 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initEvent() {
-        mBinding.vod.setOnClickListener(this::onVod);
-        mBinding.live.setOnClickListener(this::onLive);
-        mBinding.wall.setOnClickListener(this::onWall);
+        //mBinding.vod.setOnClickListener(this::onVod);
+        //mBinding.live.setOnClickListener(this::onLive);
+        //mBinding.wall.setOnClickListener(this::onWall);
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.backup.setOnClickListener(this::onBackup);
         mBinding.player.setOnClickListener(this::onPlayer);
         mBinding.restore.setOnClickListener(this::onRestore);
         mBinding.version.setOnClickListener(this::onVersion);
-        mBinding.vod.setOnLongClickListener(this::onVodEdit);
+        //mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
-        mBinding.live.setOnLongClickListener(this::onLiveEdit);
+        //mBinding.live.setOnLongClickListener(this::onLiveEdit);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
-        mBinding.wall.setOnLongClickListener(this::onWallEdit);
+        //mBinding.wall.setOnLongClickListener(this::onWallEdit);
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);

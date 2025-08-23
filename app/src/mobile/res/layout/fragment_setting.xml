@@ -56,9 +56,7 @@
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
-                    android:orientation="horizontal"
-					android:clickable="false"
-					android:focusable="false">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -116,9 +114,7 @@
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
-                    android:orientation="horizontal"
-					android:clickable="false"
-					android:focusable="false">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -176,9 +172,7 @@
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
-                    android:orientation="horizontal"
-					android:clickable="false"
-					android:focusable="false">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
