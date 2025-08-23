@@ -2,6 +2,25 @@ plugins {
     id 'com.android.application'
 }
 
+// 添加获取编码URL的方法（放在android块之外）
+def getEncodedUrl() {
+    // 优先级1: 从环境变量获取（GitHub Actions）
+    if (System.getenv('ENCODED_BASE_URL') != null) {
+        println "从环境变量读取ENCODED_BASE_URL"
+        return System.getenv('ENCODED_BASE_URL')
+    }
+    // 优先级2: 从项目属性获取（本地测试）
+    else if (project.hasProperty('encodedUrl')) {
+        println "从Gradle参数读取encodedUrl"
+        return project.property('encodedUrl')
+    }
+    // 默认值（本地开发）
+    else {
+        println "使用本地开发默认值"
+        return "aHR0cDovL2xvY2FsaG9zdDo4MDgwL2RlZmF1bHQ=" // http://localhost:8080/default
+    }
+}
+
 android {
     namespace 'com.fongmi.android.tv'
 
@@ -24,25 +43,6 @@ android {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
             }
-        }
-    }
-
-    // 添加获取编码URL的方法
-    def getEncodedUrl() {
-        // 优先级1: 从环境变量获取（GitHub Actions）
-        if (System.getenv('ENCODED_BASE_URL') != null) {
-            println "从环境变量读取ENCODED_BASE_URL"
-            return System.getenv('ENCODED_BASE_URL')
-        }
-        // 优先级2: 从项目属性获取（本地测试）
-        else if (project.hasProperty('encodedUrl')) {
-            println "从Gradle参数读取encodedUrl"
-            return project.property('encodedUrl')
-        }
-        // 默认值（本地开发）
-        else {
-            println "使用本地开发默认值"
-            return "aHR0cDovL2xvY2FsaG9zdDo4MDgwL2RlZmF1bHQ=" // http://localhost:8080/default
         }
     }
 
