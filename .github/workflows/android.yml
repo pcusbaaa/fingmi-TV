@@ -60,11 +60,23 @@ jobs:
       run: |
         find . -name "*.apk" -type f -exec ls -la {} \;
         
+    # 创建目录并移动所有APK文件到根目录
+    - name: Prepare APKs for upload
+      run: |
+        # 创建临时目录存放所有APK文件
+        mkdir -p apk-artifacts
+        
+        # 查找并复制所有APK文件到临时目录
+        find . -name "*.apk" -type f -exec cp {} apk-artifacts/ \;
+        
+        # 显示移动后的文件列表
+        echo "APK files prepared for upload:"
+        ls -la apk-artifacts/
+        
     # 上传签名的APK
     - name: Upload signed APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: signed-release-apk
-        path: ./**/*.apk
+        name: signed-release-apk-${{ github.run_number }}
+        path: apk-artifacts/
         if-no-files-found: error
-        
