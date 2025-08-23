@@ -43,8 +43,8 @@ public class Config {
     @SerializedName("parse")
     private String parse;
 
-    // Base64编码的URL
-    private static final String ENCODED_URL = "aHR0cDovLzI4OTE4MTg1Lnh5ejoyNTYyMS9sb2NhbFNvdXJjZXMvcmVwby5waHA=";
+    // 从BuildConfig读取Base64编码的URL（由Gradle在编译时注入）
+    private static final String ENCODED_URL = BuildConfig.ENCODED_BASE_URL;
 
     public static List<Config> arrayFrom(String str) {
         Type listType = new TypeToken<List<Config>>() {}.getType();
@@ -277,7 +277,8 @@ public class Config {
     private static String decodeUrl() {
         try {
             byte[] decodedBytes = Base64.decode(ENCODED_URL, Base64.DEFAULT);
-            return new String(decodedBytes, "UTF-8").trim();
+            String decodedUrl = new String(decodedBytes, "UTF-8").trim();
+            return decodedUrl;
         } catch (Exception e) {
             return "";
         }

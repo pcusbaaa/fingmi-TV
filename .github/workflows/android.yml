@@ -14,6 +14,7 @@ jobs:
       KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      ENCODED_BASE_URL: ${{ secrets.ENCODED_BASE_URL }}
 
     steps:
     - name: Checkout code
@@ -46,12 +47,25 @@ jobs:
           exit 1
         fi
         
+    - name: Verify ENCODED_BASE_URL
+      run: |
+        # 验证环境变量是否设置
+        if [ -z "$ENCODED_BASE_URL" ]; then
+          echo "ERROR: ENCODED_BASE_URL environment variable is not set!"
+          exit 1
+        else
+          echo "ENCODED_BASE_URL is set (length: ${#ENCODED_BASE_URL})"
+          # 只显示前10个字符用于验证，不显示完整内容
+          echo "ENCODED_BASE_URL preview: ${ENCODED_BASE_URL:0:10}..."
+        fi
+        
     - name: Build signed Release APK
       run: |
         # 打印环境变量用于调试
         echo "KEYSTORE_PASSWORD: ${KEYSTORE_PASSWORD:0:2}******"  # 只显示前2位
         echo "KEY_ALIAS: $KEY_ALIAS"
         echo "KEY_PASSWORD: ${KEY_PASSWORD:0:2}******"  # 只显示前2位
+        echo "ENCODED_BASE_URL: ${ENCODED_BASE_URL:0:10}..."  # 只显示前10位
         
         # 构建命令
         ./gradlew assembleRelease -x lint --info
