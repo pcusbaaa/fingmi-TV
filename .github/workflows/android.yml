@@ -1,4 +1,4 @@
-name: Android CI with Signing
+name: Android CI with Signing and Release
 
 on:
   push:
@@ -87,10 +87,48 @@ jobs:
         echo "APK files prepared for upload:"
         ls -la apk-artifacts/
         
-    # 上传签名的APK
+    # 上传签名的APK作为artifact（用于后续的release步骤）
     - name: Upload signed APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: signed-release-apk-${{ github.run_number }}
+        name: signed-release-apk
         path: apk-artifacts/
         if-no-files-found: error
+
+  # 新增：创建GitHub Release
+  create-release:
+    needs: build-and-sign
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 需要写入权限来创建release
+    
+    steps:
+    - name: Download APK artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: signed-release-apk
+        
+    - name: List downloaded APKs
+      run: ls -la
+        
+    - name: Create GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        body: |
+          Automated release built from ${{ github.sha }}
+          
+          Build Number: ${{ github.run_number }}
+          Commit: ${{ github.sha }}
+          Date: ${{ github.event.head_commit.timestamp }}
+        draft: false
+        prerelease: false
+        files: |
+          *.apk
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Display release info
+      run: |
+        echo "Release created at: ${{ steps.create_release.outputs.upload_url }}"
