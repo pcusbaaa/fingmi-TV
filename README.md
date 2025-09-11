@@ -4,6 +4,18 @@
 
 https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 
+*此项目已改为内置订阅，且无法在app端查看或修改订阅。*
+
+<u>修改内置订阅的方法：</u>
+
+**源代码：**
+
+在Repository secrets中增加参数ENCODED_BASE_URL，其值为订阅地址的base64
+
+**APP：**
+
+搜素ENCODED_URL，获得原有base64的值，然后再查找这个值，有两处，修改为新的base64值
+
 ### 點播欄位
 
 | 欄位名稱       | 預設值  | 說明   | 其他         |
