@@ -136,9 +136,9 @@
     <string name="error_empty">找不到数据</string>
 
     <!-- Update -->
-    <string name="update_version">发现新版本 <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_version">服务通知 <xliff:g name="name">%s</xliff:g></string>
     <string name="update_check">正在检测更新…</string>
-    <string name="update_confirm">更新</string>
+    <string name="update_confirm">确定</string>
 
     <!-- Crash -->
     <string name="crash_info">发生意外错误\n抱歉给您带来不便</string>
