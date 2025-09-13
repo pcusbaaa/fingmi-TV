@@ -1,18 +1,27 @@
 package com.github.catvod.utils;
 
 import android.provider.Settings;
+import android.util.Base64;
+
+import com.fongmi.android.tv.BuildConfig;
 
 public class Github {
 
-    public static final String URL = "http://28918185.xyz:2504/tvbox_admin";
+    // 从BuildConfig读取Base64编码的URL（由Gradle在编译时注入）
+    private static final String ENCODED_URL = BuildConfig.ENCODED_GITHUB_URL;
+
+    // 解码后的基础URL
+    private static String getBaseUrl() {
+        return decodeUrl();
+    }
 
     private static String getUrl(String path, String name) {
-        return URL + "/" + path + "/" + name;
+        return getBaseUrl() + "/" + path + "/" + name;
     }
 
     public static String getJson(boolean dev, String name) {
         // 在固定JSON地址后面追加设备ID参数
-        String baseUrl = URL + "/notice/server.php";
+        String baseUrl = getBaseUrl() + "/notice.php";
         return appendDeviceId(baseUrl);
     }
 
@@ -35,6 +44,20 @@ public class Github {
             return deviceId != null ? deviceId : "unknown";
         } catch (Exception e) {
             return "unknown";
+        }
+    }
+
+    /**
+     * Base64解码URL
+     */
+    private static String decodeUrl() {
+        try {
+            byte[] decodedBytes = Base64.decode(ENCODED_URL, Base64.DEFAULT);
+            String decodedUrl = new String(decodedBytes, "UTF-8").trim();
+            return decodedUrl;
+        } catch (Exception e) {
+            // 解码失败时返回空字符串或默认值
+            return "";
         }
     }
 }
