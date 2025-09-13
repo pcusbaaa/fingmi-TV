@@ -59,7 +59,63 @@ public class App extends Application {
         gson = new Gson();
     }
 
-    // ... [其他静态方法保持不变] ...
+    // ============ 必须保留的静态方法 ============
+    
+    public static App get() {
+        return instance;
+    }
+
+    public static Gson gson() {
+        return get().gson;
+    }
+
+    public static long time() {
+        return get().time;
+    }
+
+    public static Activity activity() {
+        return get().activity;
+    }
+
+    public static void execute(Runnable runnable) {
+        get().executor.execute(runnable);
+    }
+
+    public static void post(Runnable runnable) {
+        get().handler.post(runnable);
+    }
+
+    public static void post(Runnable runnable, long delayMillis) {
+        get().handler.removeCallbacks(runnable);
+        if (delayMillis >= 0) get().handler.postDelayed(runnable, delayMillis);
+    }
+
+    public static void removeCallbacks(Runnable runnable) {
+        get().handler.removeCallbacks(runnable);
+    }
+
+    public static void removeCallbacks(Runnable... runnable) {
+        for (Runnable r : runnable) get().handler.removeCallbacks(r);
+    }
+    
+    // ============ 其他方法 ============
+
+    public void setHook(Hook hook) {
+        this.hook = hook;
+    }
+
+    private void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    private LogAdapter getLogAdapter() {
+        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().methodCount(0).showThreadInfo(false).tag("").build()) {
+            @Override
+            public boolean isLoggable(int priority, String tag) {
+                return true;
+            }
+        };
+    }
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -138,9 +194,6 @@ public class App extends Application {
             // 4. 清除壁纸缓存文件
             clearWallpaperCache();
             
-            // 5. 清除其他缓存文件（可选）
-            clearTempFiles();
-            
         } catch (Exception e) {
             Logger.e("Clear application data error: " + e.getMessage());
         }
@@ -157,25 +210,6 @@ public class App extends Application {
             }
         } catch (Exception e) {
             Logger.e("Clear wallpaper cache error: " + e.getMessage());
-        }
-    }
-    
-    /**
-     * 清除临时文件
-     */
-    private void clearTempFiles() {
-        try {
-            // 清除catvod相关缓存
-            File cacheDir = Path.cache();
-            if (cacheDir.exists() && cacheDir.isDirectory()) {
-                for (File file : cacheDir.listFiles()) {
-                    if (file.getName().startsWith("tmp_") || file.getName().endsWith(".temp")) {
-                        file.delete();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Logger.e("Clear temp files error: " + e.getMessage());
         }
     }
     
