@@ -4,7 +4,7 @@ import android.provider.Settings;
 import android.util.Base64;
 
 // 导入 catvod 模块自己的 BuildConfig
-import com.github.catvod.BuildConfig;
+import com.github.catvod.crawler.BuildConfig;
 
 public class Github {
 
