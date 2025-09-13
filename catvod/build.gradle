@@ -8,6 +8,11 @@ android {
     compileSdk {
         version = release(36)
     }
+	
+	// 添加这行来启用 buildConfig 功能
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         minSdk 24
