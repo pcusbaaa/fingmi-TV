@@ -189,7 +189,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 RefreshEvent.history();
                 mBinding.vodUrl.setText(VodConfig.getDesc());
                 mBinding.liveUrl.setText(LiveConfig.getDesc());
-                mBinding.wallUrl.setText(WallConfig.getDesc());
+                // mBinding.wallUrl.setText(WallConfig.getDesc());
+				mBinding.wallUrl.setText("点击按钮更换壁纸"); // 修改为固定文字
                 break;
             case 1:
                 setCacheText();
