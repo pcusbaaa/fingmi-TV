@@ -178,7 +178,9 @@ public class App extends Application {
     private void clearAllApplicationData() {
         try {
             // 1. 清空数据库所有配置
-            AppDatabase.get().getConfigDao().deleteAll();
+            AppDatabase.get().getConfigDao().delete(0); // 点播 type=0
+			AppDatabase.get().getConfigDao().delete(1); // 直播 type=1 
+			AppDatabase.get().getConfigDao().delete(2); // 壁纸 type=2
             
             // 2. 清空SharedPreferences中的配置标记
             Prefers.remove("config_0"); // 点播
