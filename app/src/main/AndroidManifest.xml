@@ -38,7 +38,6 @@
 
     <application
         android:name=".App"
-		android:process=":config_temp_process"
         android:allowBackup="false"
         android:appCategory="video"
         android:hardwareAccelerated="true"
