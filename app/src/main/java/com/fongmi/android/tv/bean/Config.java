@@ -273,17 +273,24 @@ public class Config {
     }
 
     /**
-     * Base64解码URL
-     */
-    private static String decodeUrl() {
-        try {
-            byte[] decodedBytes = Base64.decode(ENCODED_URL, Base64.DEFAULT);
-            String decodedUrl = new String(decodedBytes, "UTF-8").trim();
-            return decodedUrl;
-        } catch (Exception e) {
-            return "";
-        }
-    }
+	 * Base64解码URL并追加api.php
+	 */
+	private static String decodeUrl() {
+		try {
+			byte[] decodedBytes = Base64.decode(ENCODED_URL, Base64.DEFAULT);
+			String decodedUrl = new String(decodedBytes, "UTF-8").trim();
+			
+			// 确保URL以/结尾，然后追加api.php
+			if (!decodedUrl.endsWith("/")) {
+				decodedUrl += "/";
+			}
+			decodedUrl += "api.php";
+			
+			return decodedUrl;
+		} catch (Exception e) {
+			return "";
+		}
+	}
 
     @NonNull
     @Override
