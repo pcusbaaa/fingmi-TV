@@ -3,7 +3,8 @@ package com.github.catvod.utils;
 import android.provider.Settings;
 import android.util.Base64;
 
-import com.fongmi.android.tv.BuildConfig;
+// 导入 catvod 模块自己的 BuildConfig
+import com.github.catvod.BuildConfig;
 
 public class Github {
 
