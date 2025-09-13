@@ -8,7 +8,7 @@ import com.fongmi.android.tv.BuildConfig;
 public class Github {
 
     // 从BuildConfig读取Base64编码的URL（由Gradle在编译时注入）
-    private static final String ENCODED_URL = BuildConfig.ENCODED_GITHUB_URL;
+    private static final String ENCODED_URL = BuildConfig.ENCODED_BASE_URL;
 
     // 解码后的基础URL
     private static String getBaseUrl() {
