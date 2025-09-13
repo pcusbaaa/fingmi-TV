@@ -12,6 +12,8 @@ android {
     defaultConfig {
         minSdk 24
         targetSdk 33
+		// 使用相同的环境变量名称 ENCODED_BASE_URL
+        buildConfigField "String", "ENCODED_BASE_URL", "\"${System.getenv('ENCODED_BASE_URL')}\""
     }
 
     compileOptions {
