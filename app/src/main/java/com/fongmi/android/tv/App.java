@@ -21,7 +21,7 @@ import com.fongmi.android.tv.event.EventIndex;
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
+import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.Path;
 import com.fongmi.hook.Hook;
 import com.github.catvod.Init;
