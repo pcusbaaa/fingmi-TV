@@ -119,11 +119,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.restore.setOnClickListener(this::onRestore);
         mBinding.version.setOnClickListener(this::onVersion);
         //mBinding.vod.setOnLongClickListener(this::onVodEdit);
-        //mBinding.vodHome.setOnClickListener(this::onVodHome);
-        mBinding.live.setOnLongClickListener(this::onLiveEdit);
+        mBinding.vodHome.setOnClickListener(this::onVodHome);
+        //mBinding.live.setOnLongClickListener(this::onLiveEdit);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
-        mBinding.wall.setOnLongClickListener(this::onWallEdit);
-        //mBinding.vodHistory.setOnClickListener(this::onVodHistory);
+        //mBinding.wall.setOnLongClickListener(this::onWallEdit);
+        mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
