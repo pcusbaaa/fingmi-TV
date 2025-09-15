@@ -82,7 +82,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vod.requestFocus();
         mBinding.vodUrl.setText(VodConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
-        mBinding.wallUrl.setText(WallConfig.getDesc());
+        //mBinding.wallUrl.setText(WallConfig.getDesc());
+		mBinding.wallUrl.setText("点击按钮更换壁纸"); // 修改为固定文字
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         setCacheText();
         setOtherText();
@@ -154,7 +155,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
             case 2:
                 Notify.progress(this);
                 WallConfig.load(config, getCallback(2));
-                mBinding.wallUrl.setText(config.getDesc());
+                //mBinding.wallUrl.setText(WallConfig.getDesc());
+				mBinding.wallUrl.setText("点击按钮更换壁纸"); // 修改为固定文字
                 break;
         }
     }
@@ -200,7 +202,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
             case 2:
                 setCacheText();
                 Notify.dismiss();
-                mBinding.wallUrl.setText(WallConfig.getDesc());
+                //mBinding.wallUrl.setText(WallConfig.getDesc());
+				mBinding.wallUrl.setText("点击按钮更换壁纸"); // 修改为固定文字
                 break;
         }
     }
