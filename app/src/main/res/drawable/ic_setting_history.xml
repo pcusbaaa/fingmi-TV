@@ -5,13 +5,13 @@
     android:viewportHeight="24"
     android:tint="#FFFFFF">
 
-    <!-- 向右箭头，靠右侧 -->
+    <!-- 上方向右箭头，上四分之一区域 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M13,7h5l-2.5,-2.5L17,3l4,4 -4,4 -1.5,-1.5L18,9h-5V7z" />
+        android:pathData="M16,3l-1.41,1.41L17.17,7H4v2h13.17l-2.58,2.59L16,13l5,-5 -5,-5z" />
 
-    <!-- 向左箭头，靠左侧 -->
+    <!-- 下方向左箭头，下四分之一区域 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M11,17H6l2.5,2.5L7,21l-4,-4 4,-4 1.5,1.5L6,15h5v2z" />
+        android:pathData="M8,21l1.41,-1.41L6.83,17H20v-2H6.83l2.58,-2.59L8,11l-5,5 5,5z" />
 </vector>
