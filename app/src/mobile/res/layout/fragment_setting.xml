@@ -96,7 +96,7 @@
                     android:background="@drawable/shape_item"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_setting_refresh" />
+                    android:src="@drawable/ic_setting_history" />
 
             </LinearLayout>
 
@@ -154,7 +154,7 @@
                     android:background="@drawable/shape_item"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/ic_setting_refresh" />
+                    android:src="@drawable/ic_setting_history" />
 
             </LinearLayout>
 
