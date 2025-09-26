@@ -103,16 +103,46 @@ public class Decoder {
     }
 
     private static String cbc(String data) throws Exception {
-        String decode = new String(Util.hex2byte(data)).toLowerCase();
-        String key = padEnd(decode.substring(decode.indexOf("$#") + 2, decode.indexOf("#$")));
-        String iv = padEnd(decode.substring(decode.length() - 13));
-        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
-        IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-        data = data.substring(data.indexOf("2324") + 4, data.length() - 26);
-        byte[] decryptData = cipher.doFinal(Util.hex2byte(data));
-        return new String(decryptData, StandardCharsets.UTF_8);
+        try {
+            // 1. 提取加密数据的hex部分（去掉开头的2423）
+            String encryptedHex = data.substring(4);
+            
+            // 2. 查找密钥标记的位置
+            int keyStart = encryptedHex.indexOf("$#") + 2;
+            int keyEnd = encryptedHex.indexOf("#$");
+            
+            if (keyStart < 2 || keyEnd <= keyStart) {
+                throw new Exception("Invalid key marker format");
+            }
+            
+            // 3. 提取密钥（在$#和#$之间）
+            String key = encryptedHex.substring(keyStart, keyEnd);
+            
+            // 4. 提取IV（最后13个字符）
+            String iv = encryptedHex.substring(encryptedHex.length() - 13);
+            
+            // 5. 提取真正的加密数据（2423之后，$#之前的部分）
+            String actualEncryptedHex = encryptedHex.substring(0, keyStart - 2);
+            
+            // 6. 填充密钥和IV到16字节
+            key = padEnd(key);
+            iv = padEnd(iv);
+            
+            // 7. 解密
+            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+            IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes(StandardCharsets.UTF_8));
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            
+            byte[] encryptedBytes = Util.hex2byte(actualEncryptedHex);
+            byte[] decryptData = cipher.doFinal(encryptedBytes);
+            
+            return new String(decryptData, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            // 解密失败，返回原始数据
+            e.printStackTrace();
+            return data;
+        }
     }
 
     private static String base64(String data) {
@@ -126,7 +156,8 @@ public class Decoder {
         return matcher.find() ? data.substring(data.indexOf(matcher.group()) + 10) : "";
     }
 
-    private static String padEnd(String key) {
-        return key + "0000000000000000".substring(key.length());
+    private static String padEnd(String text) {
+        if (text.length() >= 16) return text.substring(0, 16);
+        return text + "0000000000000000".substring(text.length());
     }
 }
