@@ -69,8 +69,8 @@ public class Decoder {
     private static String getDeviceId() {
         try {
             return android.provider.Settings.Secure.getString(
-                    com.fongmi.android.tv.App.get().getContentResolver(),
-                    android.provider.Settings.Secure.ANDROID_ID
+                com.fongmi.android.tv.App.get().getContentResolver(),
+                android.provider.Settings.Secure.ANDROID_ID
             );
         } catch (Exception e) {
             return "unknown";
@@ -79,10 +79,54 @@ public class Decoder {
 
     private static String verify(String url, String data) throws Exception {
         if (data.isEmpty()) throw new Exception();
-        if (Json.isObj(data)) return fix(url, data);
+        // 优先尝试解析 envelope 信封格式
+        if (Json.isObj(data)) {
+            // 检查是否是加密信封格式
+            try {
+                org.json.JSONObject obj = new org.json.JSONObject(data);
+                if (obj.has("type") && "aes_cbc".equals(obj.getString("type")) &&
+                    obj.has("key") && obj.has("iv") && obj.has("data")) {
+
+                    String keyHex = obj.getString("key");
+                    String ivHex = obj.getString("iv");
+                    String encData = obj.getString("data");
+
+                    // 解密
+                    String plain = aesCbcDecrypt(encData, keyHex, ivHex);
+                    return fix(url, plain);
+                }
+            } catch (Exception e) {
+                // 不是信封格式，继续后面流程
+            }
+            return fix(url, data);
+        }
         if (data.contains("**")) data = base64(data);
         if (data.startsWith("2423")) data = cbc(data);
         return fix(url, data);
+    }
+
+    // AES/CBC/PKCS5Padding 解密，key/iv 为 hex，data 为 base64
+    private static String aesCbcDecrypt(String base64Data, String keyHex, String ivHex) throws Exception {
+        byte[] key = hexStringToByteArray(keyHex);
+        byte[] iv = hexStringToByteArray(ivHex);
+        byte[] enc = Base64.decode(base64Data, Base64.DEFAULT);
+
+        SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivSpec = new IvParameterSpec(iv);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+        byte[] decrypted = cipher.doFinal(enc);
+        return new String(decrypted, StandardCharsets.UTF_8);
+    }
+
+    private static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                                 + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
     }
 
     private static String fix(String url, String data) {
@@ -102,50 +146,18 @@ public class Decoder {
         return data.replace(ext, t);
     }
 
-    /**
-     * CBC 解密逻辑
-     * 数据格式：
-     * 2423 + [HEX密文] + "$#" + key + "#$" + iv(13字节)
-     */
-    private static String cbc(String data) {
-        try {
-            // 1. 去掉前缀 2423
-            String body = data.substring(4);
-
-            // 2. 找到 key 标记
-            int keyStart = body.indexOf("$#");
-            int keyEnd = body.indexOf("#$");
-            if (keyStart < 0 || keyEnd < 0 || keyEnd <= keyStart) {
-                throw new Exception("Invalid key marker format");
-            }
-
-            // 3. 提取密文 hex
-            String encryptedHex = body.substring(0, keyStart);
-
-            // 4. 提取 key
-            String key = body.substring(keyStart + 2, keyEnd);
-
-            // 5. 提取 iv（#$/之后）
-            String iv = body.substring(keyEnd + 2);
-
-            // 6. 补齐 key 和 iv 到 16 字节
-            key = padEnd(key);
-            iv = padEnd(iv);
-
-            // 7. 解密
-            SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
-            IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes(StandardCharsets.UTF_8));
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-
-            byte[] encryptedBytes = Util.hex2byte(encryptedHex);
-            byte[] decryptData = cipher.doFinal(encryptedBytes);
-
-            return new String(decryptData, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return data;
-        }
+    // 保留原有 CBC/BASE64 解密方法
+    private static String cbc(String data) throws Exception {
+        String decode = new String(Util.hex2byte(data)).toLowerCase();
+        String key = padEnd(decode.substring(decode.indexOf("$#") + 2, decode.indexOf("#$")));
+        String iv = padEnd(decode.substring(decode.length() - 13));
+        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
+        IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+        data = data.substring(data.indexOf("2324") + 4, data.length() - 26);
+        byte[] decryptData = cipher.doFinal(Util.hex2byte(data));
+        return new String(decryptData, StandardCharsets.UTF_8);
     }
 
     private static String base64(String data) {
@@ -159,9 +171,7 @@ public class Decoder {
         return matcher.find() ? data.substring(data.indexOf(matcher.group()) + 10) : "";
     }
 
-    private static String padEnd(String text) {
-        if (text == null) return "0000000000000000";
-        if (text.length() >= 16) return text.substring(0, 16);
-        return text + "0000000000000000".substring(text.length());
+    private static String padEnd(String key) {
+        return key + "0000000000000000".substring(key.length());
     }
 }
