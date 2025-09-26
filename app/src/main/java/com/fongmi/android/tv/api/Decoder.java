@@ -79,9 +79,13 @@ public class Decoder {
 
     private static String verify(String url, String data) throws Exception {
         if (data.isEmpty()) throw new Exception();
-        // 优先尝试解析 envelope 信封格式
+        // 尝试解混淆
+        if (isHex(data)) {
+            String plain = deobfuscate(data);
+            return fix(url, plain);
+        }
+        // 兼容 envelope/aes_cbc 格式
         if (Json.isObj(data)) {
-            // 检查是否是加密信封格式
             try {
                 org.json.JSONObject obj = new org.json.JSONObject(data);
                 if (obj.has("type") && "aes_cbc".equals(obj.getString("type")) &&
@@ -91,7 +95,6 @@ public class Decoder {
                     String ivHex = obj.getString("iv");
                     String encData = obj.getString("data");
 
-                    // 解密
                     String plain = aesCbcDecrypt(encData, keyHex, ivHex);
                     return fix(url, plain);
                 }
@@ -103,6 +106,37 @@ public class Decoder {
         if (data.contains("**")) data = base64(data);
         if (data.startsWith("2423")) data = cbc(data);
         return fix(url, data);
+    }
+
+    /** 判断是否为 hex 字符串 **/
+    private static boolean isHex(String s) {
+        return s.matches("[0-9a-fA-F]+") && s.length() % 2 == 0 && s.length() > 20;
+    }
+
+    /**
+     * 针对 obfuscate_payload 方案的解混淆
+     * 步骤: hex解码 -> 去干扰符 -> 反转 -> 自定义base64表还原 -> base64解码
+     */
+    private static String deobfuscate(String data) {
+        // 1. hex 解码
+        byte[] bytes = hexStringToByteArray(data);
+        String noisy = new String(bytes, StandardCharsets.UTF_8);
+        // 2. 去除所有干扰符
+        String clean = noisy.replaceAll("[#@&%\\*]", "");
+        // 3. 反转字符串
+        String rev = new StringBuilder(clean).reverse().toString();
+        // 4. 自定义base64表还原
+        String tableSrc = "QWERTYUIOPASDFGHJKLZXCVBNMpoiuytrewqasdfghjklmnbvcxz1234567890-_";
+        String tableDst = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        StringBuilder b64 = new StringBuilder();
+        for (int i = 0; i < rev.length(); ++i) {
+            char c = rev.charAt(i);
+            int idx = tableSrc.indexOf(c);
+            b64.append(idx >= 0 ? tableDst.charAt(idx) : c);
+        }
+        // 5. base64 解码
+        byte[] decoded = Base64.decode(b64.toString(), Base64.DEFAULT);
+        return new String(decoded, StandardCharsets.UTF_8);
     }
 
     // AES/CBC/PKCS5Padding 解密，key/iv 为 hex，data 为 base64
