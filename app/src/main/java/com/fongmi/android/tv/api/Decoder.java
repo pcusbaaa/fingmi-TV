@@ -27,7 +27,7 @@ public class Decoder {
     public static String getJson(String url, String tag) throws Exception {
         // 为所有域名添加完整参数集
         url = addUniversalQueryParams(url);
-        
+
         try (Response res = OkHttp.newCall(url, tag).execute()) {
             HttpUrl httpUrl = res.request().url();
             int size = HttpUrl.parse(url).querySize();
@@ -39,29 +39,29 @@ public class Decoder {
     private static String addUniversalQueryParams(String url) {
         HttpUrl httpUrl = HttpUrl.parse(url);
         if (httpUrl == null) return url;
-        
+
         HttpUrl.Builder builder = httpUrl.newBuilder();
-        
+
         // 时间相关参数
         builder.addQueryParameter("timestamp", String.valueOf(System.currentTimeMillis()));
         builder.addQueryParameter("time", String.valueOf(System.currentTimeMillis() / 1000));
-        
+
         // 应用信息
         builder.addQueryParameter("app_version", BuildConfig.VERSION_NAME);
         builder.addQueryParameter("app_build", String.valueOf(BuildConfig.VERSION_CODE));
         builder.addQueryParameter("package_name", BuildConfig.APPLICATION_ID);
-        
+
         // 设备信息
         builder.addQueryParameter("platform", "android");
         builder.addQueryParameter("device_type", "tv");
         builder.addQueryParameter("sdk_version", String.valueOf(android.os.Build.VERSION.SDK_INT));
-        
+
         // 业务参数
         builder.addQueryParameter("source", "fongmi");
         builder.addQueryParameter("channel", "official");
         builder.addQueryParameter("language", Locale.getDefault().getLanguage());
         builder.addQueryParameter("device_id", getDeviceId());
-        
+
         return builder.build().toString();
     }
 
@@ -69,8 +69,8 @@ public class Decoder {
     private static String getDeviceId() {
         try {
             return android.provider.Settings.Secure.getString(
-                com.fongmi.android.tv.App.get().getContentResolver(),
-                android.provider.Settings.Secure.ANDROID_ID
+                    com.fongmi.android.tv.App.get().getContentResolver(),
+                    android.provider.Settings.Secure.ANDROID_ID
             );
         } catch (Exception e) {
             return "unknown";
@@ -102,44 +102,47 @@ public class Decoder {
         return data.replace(ext, t);
     }
 
-    private static String cbc(String data) throws Exception {
+    /**
+     * CBC 解密逻辑
+     * 数据格式：
+     * 2423 + [HEX密文] + "$#" + key + "#$" + iv(13字节)
+     */
+    private static String cbc(String data) {
         try {
-            // 1. 提取加密数据的hex部分（去掉开头的2423）
-            String encryptedHex = data.substring(4);
-            
-            // 2. 查找密钥标记的位置
-            int keyStart = encryptedHex.indexOf("$#") + 2;
-            int keyEnd = encryptedHex.indexOf("#$");
-            
-            if (keyStart < 2 || keyEnd <= keyStart) {
+            // 1. 去掉前缀 2423
+            String body = data.substring(4);
+
+            // 2. 找到 key 标记
+            int keyStart = body.indexOf("$#");
+            int keyEnd = body.indexOf("#$");
+            if (keyStart < 0 || keyEnd < 0 || keyEnd <= keyStart) {
                 throw new Exception("Invalid key marker format");
             }
-            
-            // 3. 提取密钥（在$#和#$之间）
-            String key = encryptedHex.substring(keyStart, keyEnd);
-            
-            // 4. 提取IV（最后13个字符）
-            String iv = encryptedHex.substring(encryptedHex.length() - 13);
-            
-            // 5. 提取真正的加密数据（2423之后，$#之前的部分）
-            String actualEncryptedHex = encryptedHex.substring(0, keyStart - 2);
-            
-            // 6. 填充密钥和IV到16字节
+
+            // 3. 提取密文 hex
+            String encryptedHex = body.substring(0, keyStart);
+
+            // 4. 提取 key
+            String key = body.substring(keyStart + 2, keyEnd);
+
+            // 5. 提取 iv（#$/之后）
+            String iv = body.substring(keyEnd + 2);
+
+            // 6. 补齐 key 和 iv 到 16 字节
             key = padEnd(key);
             iv = padEnd(iv);
-            
+
             // 7. 解密
             SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
             IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes(StandardCharsets.UTF_8));
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-            
-            byte[] encryptedBytes = Util.hex2byte(actualEncryptedHex);
+
+            byte[] encryptedBytes = Util.hex2byte(encryptedHex);
             byte[] decryptData = cipher.doFinal(encryptedBytes);
-            
+
             return new String(decryptData, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            // 解密失败，返回原始数据
             e.printStackTrace();
             return data;
         }
@@ -157,6 +160,7 @@ public class Decoder {
     }
 
     private static String padEnd(String text) {
+        if (text == null) return "0000000000000000";
         if (text.length() >= 16) return text.substring(0, 16);
         return text + "0000000000000000".substring(text.length());
     }
